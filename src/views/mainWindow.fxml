@@ -24,6 +24,7 @@
                 <TextField fx:id="searchField" GridPane.columnIndex="1" />
                 <Button prefWidth="100" onAction="#searchAction" text="Search" GridPane.columnIndex="2" />
                 <Button prefWidth="100" onAction="#clearAction" text="Clear" GridPane.columnIndex="3" />
+                <Button prefWidth="100" onAction="#addAction" text="AddLog" GridPane.columnIndex="3" />
             </HBox>
             <ListView fx:id="listMediaItems" />
         </VBox>

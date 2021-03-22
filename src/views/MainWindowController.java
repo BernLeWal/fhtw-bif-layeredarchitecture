@@ -6,15 +6,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import models.MediaFolder;
 import models.MediaItem;
+import models.MediaLogs;
 
+import java.net.URL;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class MainWindowController {
+public class MainWindowController implements Initializable {
 
     public TextField searchField;
     public ListView<MediaItem> listMediaItems;
@@ -24,8 +28,8 @@ public class MainWindowController {
     private MediaItem currentItem;
     private MediaFolder folder;
 
-    @FXML
-    void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
         initController();
         initListView();
     }
@@ -75,5 +79,9 @@ public class MainWindowController {
         searchField.textProperty().setValue("");
 
         mediaItems.addAll(mediaManager.GetItems(folder));
+    }
+
+    public void addAction(ActionEvent actionEvent) {
+        mediaManager.AddItemLog(currentItem, new MediaLogs("example Text"));
     }
 }

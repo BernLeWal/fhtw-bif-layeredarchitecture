@@ -1,7 +1,9 @@
 package businessLogic;
 
+import dataAccessLayer.MediaItemDAO;
 import models.MediaFolder;
 import models.MediaItem;
+import models.MediaLogs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class JavaAppManagerImpl implements JavaAppManager {
+
+    private MediaItemDAO mediaItemDAO = new MediaItemDAO();
+
     @Override
     public MediaFolder GetMediaFolder(String url) {
         // usally located somewhere on the disk
@@ -17,14 +22,7 @@ class JavaAppManagerImpl implements JavaAppManager {
 
     @Override
     public List<MediaItem> GetItems(MediaFolder folder) {
-        // usually querying the disk, or from a DB, or ...
-        MediaItem[] mediaItems = { new MediaItem("Item1"),
-                new MediaItem("Item2"),
-                new MediaItem("Another"),
-                new MediaItem("SWEI"),
-                new MediaItem("FHTW")
-        };
-        return new ArrayList<MediaItem>(Arrays.asList(mediaItems));
+        return mediaItemDAO.GetItems();
     }
 
     @Override
@@ -42,5 +40,10 @@ class JavaAppManagerImpl implements JavaAppManager {
                 .stream()
                 .filter(x -> x.Name.toLowerCase().contains(itemName.toLowerCase()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void AddItemLog(MediaItem item, MediaLogs logs) {
+        mediaItemDAO.AddLogToItem(item, logs);
     }
 }
