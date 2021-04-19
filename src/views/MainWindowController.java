@@ -2,19 +2,26 @@ package views;
 
 import businessLogic.JavaAppManager;
 import businessLogic.JavaAppManagerFactory;
+import businessLogic.NameGenerator;
+import dataAccessLayer.common.DALFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import lombok.SneakyThrows;
 import models.MediaFolder;
 import models.MediaItem;
-import models.MediaLogs;
+import models.MediaLog;
 
+import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -22,16 +29,20 @@ public class MainWindowController implements Initializable {
 
     public TextField searchField;
     public ListView<MediaItem> listMediaItems;
+    public Button genItemLog;
 
     private ObservableList<MediaItem> mediaItems;
     private JavaAppManager mediaManager;
     private MediaItem currentItem;
     private MediaFolder folder;
 
+    @SneakyThrows
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        DALFactory.Init();
         initController();
         initListView();
+        genItemLog.disableProperty().bind(listMediaItems.getSelectionModel().selectedItemProperty().isNull());
     }
 
     private void initController() {
@@ -39,7 +50,7 @@ public class MainWindowController implements Initializable {
         folder = mediaManager.GetMediaFolder("Get Media Folder From Disk");
     }
 
-    private void initListView() {
+    private void initListView() throws SQLException, IOException, ClassNotFoundException {
         mediaItems = FXCollections.observableArrayList();
         mediaItems.addAll(mediaManager.GetItems(folder));
         listMediaItems.setItems(mediaItems);
@@ -66,7 +77,7 @@ public class MainWindowController implements Initializable {
         });
     }
 
-    public void searchAction(ActionEvent actionEvent) {
+    public void searchAction(ActionEvent actionEvent) throws SQLException, IOException, ClassNotFoundException {
         mediaItems.clear();
         List<MediaItem> items = mediaManager.SearchForItems(searchField.textProperty().getValue(), folder, false);
 
@@ -74,14 +85,20 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    public void clearAction(ActionEvent actionEvent) {
+    public void clearAction(ActionEvent actionEvent) throws SQLException, IOException, ClassNotFoundException {
         mediaItems.clear();
         searchField.textProperty().setValue("");
 
         mediaItems.addAll(mediaManager.GetItems(folder));
     }
 
-    public void addAction(ActionEvent actionEvent) {
-        mediaManager.AddItemLog(currentItem, new MediaLogs("example Text"));
+    @FXML
+    public void genItemAction(ActionEvent actionEvent) throws SQLException, IOException, ClassNotFoundException {
+        MediaItem genItem = mediaManager.CreateItem(NameGenerator.Generate(4), NameGenerator.Generate(8), NameGenerator.Generate(16), LocalDateTime.now());
+        mediaItems.add(genItem);
+    }
+
+    public void genItemLogAction(ActionEvent actionEvent) throws SQLException, IOException, ClassNotFoundException {
+        MediaLog genLog = mediaManager.CreateItemLog(NameGenerator.Generate(45), currentItem);
     }
 }
